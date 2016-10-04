@@ -1,65 +1,388 @@
 <!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>Defensive Coding for Dummies</title>
+        <title>Defensive Coding for Dummies</title>
 
-		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/black.css">
+        <link rel="stylesheet" href="css/reveal.css">
+        <link rel="stylesheet" href="css/theme/black.css">
 
-		<!-- Theme used for syntax highlighting of code -->
-		<link rel="stylesheet" href="lib/css/zenburn.css">
+        <!-- Theme used for syntax highlighting of code -->
+        <link rel="stylesheet" href="lib/css/zenburn.css">
 
-		<!-- Printing and PDF exports -->
-		<script>
-			var link = document.createElement( 'link' );
-			link.rel = 'stylesheet';
-			link.type = 'text/css';
-			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
-			document.getElementsByTagName( 'head' )[0].appendChild( link );
-		</script>
-	</head>
-	<body>
-		<div class="reveal">
-			<div class="slides">
-				<section>Good Morning!</section>
-                <section>I am Chad Gray</section>
-				<section>
+        <!-- Printing and PDF exports -->
+        <script>
+            var link = document.createElement( 'link' );
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+            document.getElementsByTagName( 'head' )[0].appendChild( link );
+        </script>
+    </head>
+    <body>
+        <div class="reveal">
+            <div class="slides">
+                <section>Good Morning!</section>
+
+                <section>I'm Chad</section>
+                <section>
                     <p>AKA Chadicus</p>
                     <img src="https://avatars1.githubusercontent.com/u/1182337?v=3&s=466" />
                 </section>
-				<section><h1>Defensive Coding for Dummies</h1></section>
-				<section>
-					<section>Basic Object Calisthenics</section>
-                    <section><img src="https://imagery.pragprog.com/products/105/twa.jpg?1298589765" width="500"/></section>
-				</section>
-				<section>Stateless/Immutable objects</section>
-				<section>Stop using setters</section>
-				<section>Inject Dependencies</section>
-				<section>One-way to rule them all</section>
-				<section>final/sealed</section>
-				<section>TEST, TEST, TEST</section>
-			</div>
-		</div>
+                <section>
+                    I like PHP
+                    <aside class="notes">
+                        All code examples will be in PHP
+                    </aside>
+                </section>
+                <section>I also like the Hulk</section>
+                <section>
+                    I helped create DE DevCon
+                    <aside class="notes">
+                        You're not here for me.
+                    </aside>
+                </section>
+                <section><h1>Defensive Coding for Dummies</h1></section>
+                <section>
+                    What is Defensive Coding?
+                    <aside class="notes">
+                        <ul>
+                            <li>Includes data validation</li>
+                            <li>Includes security</li>
+                            <li>SOLID practices</li>
+                        <ul>
+                    </asid>
+                </section>
+                <section>Similar to Defensive Drving</section>
+                <section>Drive assuming everyone around you can make a mistake.</section>
+                <section>Write code assuming anyone who uses it can and will make a mistake.</section>
+                <section>
+                    Your job is to limit the mistakes they can make
+                    <aside class="notes">
+                        <ul>
+                            <li>Developers, all of us, are dumb</li>
+                            <li>We do not always read documentation</li>
+                            <li>We don't always write documentation</li>
+                            <li>We often copy/paste code without understanding it.</li>
+                        <ul>
+                    </asid>
+                </section>
+                <section><img src="http://www.publicdomainpictures.net/pictures/110000/nahled/one-way-sign-1415457374Snh.jpg" /></section>
+                <section>Users of your code should have one clear path to perform any task.</section>
+                <section><img src="http://www.codecat.com/wp-content/uploads/2010/05/feature-creep.jpg" /></section>
+                <section>Code for your use case, not your re-use case</section>
+                <section>DISCLAIMER
+                    <aside class="notes">
+                        <ul>
+                            <li>These practices are extreme.</li>
+                            <li>They will NOT make coding easier.</li>
+                            <li>You will beg for less features</li>
+                            <li>You will write better code</li>
+                        </ul>
+                    </aside>
+                </section>
+                <section>Stop using setters</section>
+                <section data-markdown>
+                    ```php
+                    class Notifier
+                    {
+                        public function __construct(...)
+                        {
+                            // ...
+                        }
 
-		<script src="lib/js/head.min.js"></script>
-		<script src="js/reveal.js"></script>
+                        public function setMailer(MailerInterface $mailer)
+                        {
+                            $this->mailer = $mailer;
+                        }
+                    }
+                    ```
+                </section>
+                <section>Setters are useless</section>
+                <section>Inject dependencies in constructor</section>
+                <section data-markdown>
+                    ```php
+                    class Notifier
+                    {
+                        public function __construct(MailerInterface $mailer)
+                        {
+                            $this->mailer = $mailer;
+                        }
+                    }
+                    ```
+                </section>
+                <section><img src="http://i.imgur.com/Usmjj5P.gif" /></section>
+                <section data-markdown>
+                    ```php
+                    class Notifier
+                    {
+                        public function __construct(MailerInterface $mailer)
+                        {
+                            $this->mailer = $mailer;
+                        }
+                    }
 
-		<script>
-			// More info https://github.com/hakimel/reveal.js#configuration
-			Reveal.initialize({
-				history: true,
+                    $notifier = new Notifier(new FakeMailer());
+                    ```
 
-				// More info https://github.com/hakimel/reveal.js#dependencies
-				dependencies: [
-					{ src: 'plugin/markdown/marked.js' },
-					{ src: 'plugin/markdown/markdown.js' },
-					{ src: 'plugin/notes/notes.js', async: true },
-					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
-				]
-			});
-		</script>
-	</body>
+                    Note:
+                    * Tell, don't ask
+                    * If the null/fake implementation of your dependency doesn't exist. Create it.
+                    * Single responsibility
+                </section>
+                <section>Inject <strong>ALL</strong> Dependencies</section>
+                <section data-markdown>
+                    ```php
+                    class Notifier
+                    {
+                        public function __construct(MailerInterface $mailer)
+                        {
+                            $this->database = DbConnection::getInstance();
+                            $this->mailer = $mailer;
+                        }
+                    }
+                    ```
+                </section>
+                <section data-markdown>
+                    ```php
+                    class Notifier
+                    {
+                        public function __construct(
+                            MailerInterface $mailer,
+                            DbConnection $database
+                        )
+                        {
+                            $this->database = $database;
+                            $this->mailer = $mailer;
+                        }
+                    }
+                    ```
+                    Note:
+                    * Static access causes unexchangeable dependencies to other classes and leads to hard to test code
+                    * Use of the <strong>new</strong> keyword in a constructor should be a code smell
+                </section>
+                <section>
+                    Avoid Unnecessary Public Methods
+                    <aside class="notes">
+                        <ul>
+                            <li>Unnecessary == there is another way to accomplish the same task</li>
+                        </ul>
+                    </aside>
+                </section>
+                <section data-markdown>
+                    ```php
+                    class Listing
+                    {
+                        const REALM_ID = 4;
+
+                        // ...
+
+                        public function getRealmId()
+                        {
+                            return self::REALM_ID;
+                        }
+                    }
+                    ```
+
+                    Note:
+                    A public method is like a child
+                </section>
+                <section>
+                    <p>"A public method is like a child: once you've written it, you are going to maintain it for the rest of its life!"<br /> - Stefan Priebsch</p>
+                    <aside class="notes">
+                        Stefan works with Sebastian Bergman (PHPUnit), met him at ZendCon
+                    </aside>
+                </section>
+                <section>Avoid Logic Switch Parameters</section>
+                <section data-markdown>
+                    ```php
+                    public function getPhotoUrl($useCdn = false)
+                    {
+                        // ...
+                    }
+                    ```
+                    Note:
+                    * Violates Single Responsibility Principle
+                </section>
+                <section data-markdown>
+                    ```php
+                    public function getPhotoUrl()
+                    {
+                        // ...
+                    }
+
+                    public function getCdnPhotoUrl()
+                    {
+                        // ...
+                    }
+                    ```
+                    Note:
+                    * Worth the extra effort
+                </section>
+                <section>All State Should be Encapsulated</section>
+                <section data-markdown>
+                    ```php
+                    class Ad
+                    {
+                        private $created;
+
+                        public function __construct(\DateTime $dateTime)
+                        {
+                            $this->created = $dateTime;
+                        }
+
+                        // ...
+                    }
+                    ```
+
+                    ```php
+                    $now = new \DateTime();
+                    $ad = new Ad($now);
+                    ```
+
+                    ```
+                    // Do stuff ...
+                    ```
+
+                    ```php
+                    $now->setTimestamp($aTimestamp);
+                    ```
+                    Note:
+                    * State of ad can be changed without its knowledge
+                </section>
+                <section data-markdown>
+                    ```php
+                    public function __construct(\DateTime $dateTime)
+                    {
+                        $this->created = clone $dateTime;
+                    }
+                    ```
+
+                    ```php
+                    public function __construct(\DateTimeImmutable $dateTime)
+                    {
+                        $this->created = $dateTime;
+                    }
+                    ```
+                    Note:
+                    * clone the dependency
+                    * or use immutable implementation
+                </section>
+                <section>
+                    Private Properties Only
+                    <aside class="notes">
+                        <ul>
+                            <li>Absolutely no public properties</li>
+                            <li>protected as a last resort</li>
+                            <li>fragile base class problem - seemingly safe changes to base class, may cause the derived classes to malfunction</li>
+                        </ul>
+                    </aside>
+                </section>
+                <section>No Mixed Parameter Types</section>
+                <section data-markdown>
+                    ```php
+                    /**
+                     * Gets the options of the object.
+                     *
+                     * @param mixed $options Array, config object or a json string.
+                     *
+                     * @return void
+                     */
+                    public function setOptions($options = null)
+                    {
+                        // ...
+                    }
+                    ```
+                    Note:
+                    * Simplified example. Do not use a setter
+                    * Pick a type, make the calling code perform the conversion
+                </section>
+                <section>No Mixed Return Types</section>
+                <section>
+                    Make Classes FINAL by Default
+                    <aside class="notes">
+                        <ul>
+                            <li>An extension is s different use case</li>
+                        </ul>
+                    </aside>
+                </section>
+                <section>Disable Cloning and Serialization by Default</section>
+                <section data-markdown>
+                    ```php
+                    public function __clone()
+                    {
+                        throw new \BadMethodCallException(
+                            'Cloning of this object is not allowed'
+                        );
+                    }
+                    ```
+                    Note:
+                    * Do you need to clone or serialize?
+                    * Is it part of your use case?
+                    * Do you know the lifecycle of every dependency
+                    * Cloning requires encapsulated state understanding
+                    * If cloning is part of your use case, ensure deep cloning
+                </section>
+                <section>Test ALL Scenarios </section>
+                <section data-markdown>
+                    ```php
+                    /**
+                     * Authenticate the user.
+                     *
+                     * @param string $username
+                     * @param string $password
+                     *
+                     * @return bool
+                     *
+                     * @throws InvalidArgumentException
+                     * @throws AuthenticateException
+                     * @throws DomainException
+                     */
+                    public function authenticate($username, $password);
+					```
+					Note:
+					* A lot can happen with this method
+					* A TRUE is returned
+					* A FALSE is returned
+					* InvalidArgumentException is thrown
+					* AuthenticateException is thrown
+					* DomainException is thrown
+                    * 5 tests
+                </section>
+                <section>
+                    <p>Recap</p>
+                    <p class="fragment">Inject ALL dependencies with constructor</p>
+                    <p class="fragment">Avoid Unnecessary Public Methods</p>
+                    <p class="fragment">Avoid Logic Switch Parameters</p>
+                    <p class="fragment">All State Should be Encapsulated</p>
+                    <p class="fragment">No Mixed Parameter or Return Types</p>
+                    <p class="fragment">Make Classes FINAL by Default</p>
+                    <p class="fragment">Disable Cloning and Serialization by Default</p>
+                    <p class="fragment">Test ALL Scenarios</p>
+                </section>
+                <section>Questions?</section>
+                <section>Fill out the Survey<br /> http://devcon.dominionenterprises.com/2016/survey</section>
+            </div>
+        </div>
+
+        <script src="lib/js/head.min.js"></script>
+        <script src="js/reveal.js"></script>
+
+        <script>
+            // More info https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                history: true,
+
+                // More info https://github.com/hakimel/reveal.js#dependencies
+                dependencies: [
+                    { src: 'plugin/markdown/marked.js' },
+                    { src: 'plugin/markdown/markdown.js' },
+                    { src: 'plugin/notes/notes.js', async: true },
+                    { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+                ]
+            });
+        </script>
+    </body>
 </html>
